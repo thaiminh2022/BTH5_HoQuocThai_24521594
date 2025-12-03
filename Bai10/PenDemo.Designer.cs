@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
             endCapComboBox = new ComboBox();
@@ -43,6 +44,7 @@
             dashStyleComboBox = new ComboBox();
             label1 = new Label();
             drawingPanel = new Panel();
+            widthTooltip = new ToolTip(components);
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -138,7 +140,6 @@
             // 
             // dashWidthComboBox
             // 
-            dashWidthComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             dashWidthComboBox.FormattingEnabled = true;
             dashWidthComboBox.Location = new Point(96, 73);
             dashWidthComboBox.Name = "dashWidthComboBox";
@@ -229,5 +230,6 @@
         private ComboBox lineJoinComboBox;
         private Label label2;
         private Panel drawingPanel;
+        private ToolTip widthTooltip;
     }
 }

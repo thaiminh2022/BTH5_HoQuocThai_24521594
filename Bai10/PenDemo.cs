@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Reflection;
 
 namespace Bai10
@@ -48,7 +48,7 @@ namespace Bai10
             endCapComboBox.Items.AddRange(dashCaps);
             endCapComboBox.SelectedIndex = 0;
 
-            var sizes = Enumerable.Range(1, 100).ToArray();
+            List<float> sizes = [.. Enumerable.Range(1, 24)];
             dashWidthComboBox.Items.AddRange([.. sizes]);
             dashWidthComboBox.SelectedIndex = 0;
 
@@ -60,11 +60,48 @@ namespace Bai10
             endCapComboBox.SelectedIndexChanged += (_, _) => drawingPanel.Invalidate();
             dashWidthComboBox.SelectedIndexChanged += (_, _) => drawingPanel.Invalidate();
 
+
+            dashWidthComboBox.KeyDown += DashWidthComboBox_KeyDown;
+
             // mouse
             drawingPanel.MouseDown += DrawingPanel_MouseDown;
             drawingPanel.MouseUp += DrawingPanel_MouseUp;
             drawingPanel.MouseMove += DrawingPanel_MouseMove;
             drawingPanel.Invalidate();
+            
+            //tooltip
+            widthTooltip.SetToolTip(dashWidthComboBox, "Nhập số và nhấn Enter để thêm kích thước tùy chỉnh");
+
+        }
+
+        private void DashWidthComboBox_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+                return;
+
+            if (float.TryParse(dashWidthComboBox.Text, out var value))
+            {
+                if (value <= 0)
+                {
+                    value = Math.Abs(value);
+                }
+
+                if (!dashWidthComboBox.Items.Contains(value))
+                {
+                    // insert sorted
+                    
+                    int index = 0;
+                    while (index < dashWidthComboBox.Items.Count && (float?)dashWidthComboBox.Items[index] < value)
+                    {
+                        index++;
+                    }
+
+                    dashWidthComboBox.Items.Insert(index, value);
+                }
+
+                dashWidthComboBox.SelectedItem = value;
+                drawingPanel.Invalidate();
+            }
         }
 
         private void DrawingPanel_MouseMove(object? sender, MouseEventArgs e)
@@ -128,23 +165,14 @@ namespace Bai10
         }
         private void DrawingPanel_Paint(object? sender, PaintEventArgs e)
         {
-
             var g = e.Graphics;
 
-            // line drawing
-            foreach (var line in lines)
-            {
-                using var drawPen = new Pen(Color.DarkBlue, line.Width);
-                drawPen.DashStyle = line.DashStyle;
-                drawPen.LineJoin = line.LineJoin;
-                drawPen.DashCap = line.DashCap;
-                drawPen.StartCap = line.StartCap;
-                drawPen.EndCap = line.EndCap;
-                g.DrawLine(drawPen, line.StartPos, line.EndPos);
-            }
+            MainDraw(g);
+            LineDraw(g);
+        }
 
-
-            // main drawing
+        private void MainDraw(Graphics g)
+        {
             if (IsDrawBlocked())
                 return;
 
@@ -161,6 +189,21 @@ namespace Bai10
             pen.Width = GetSettingFromComboBox(dashWidthComboBox) ?? pen.Width;
 
             g.DrawLine(pen, startPos.Value, endPos.Value);
+        }
+
+        private void LineDraw(Graphics g)
+        {
+            // line drawing
+            foreach (var line in lines)
+            {
+                using var drawPen = new Pen(Color.DarkBlue, line.Width);
+                drawPen.DashStyle = line.DashStyle;
+                drawPen.LineJoin = line.LineJoin;
+                drawPen.DashCap = line.DashCap;
+                drawPen.StartCap = line.StartCap;
+                drawPen.EndCap = line.EndCap;
+                g.DrawLine(drawPen, line.StartPos, line.EndPos);
+            }
         }
 
         private T? GetSettingFromComboBox<T>(ComboBox box) where T : struct
