@@ -1,5 +1,4 @@
 using System.Drawing.Drawing2D;
-using System.Net.Mime;
 using System.Reflection;
 namespace Bai11
 {
@@ -299,8 +298,6 @@ namespace Bai11
             return _currentShape != Bai11.DrawShape.None &&
                 _currentBrush != BrushData.None &&
                 _currentWith > 0;
-
         }
-
     }
 }
