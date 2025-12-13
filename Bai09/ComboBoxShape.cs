@@ -13,8 +13,6 @@ namespace Bai09
         FilledPie,
     }
 
-
-
     public partial class ComboBoxShape : Form
     {
 

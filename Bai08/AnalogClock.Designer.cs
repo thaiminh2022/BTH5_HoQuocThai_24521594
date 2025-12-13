@@ -30,17 +30,11 @@
         {
             components = new System.ComponentModel.Container();
             secondTimer = new System.Windows.Forms.Timer(components);
-            minuteTimer = new System.Windows.Forms.Timer(components);
-            hourTimer = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // secondTimer
             // 
             secondTimer.Interval = 200;
-            // 
-            // minuteTimer
-            // 
-            minuteTimer.Interval = 12000;
             // 
             // AnalogClock
             // 
@@ -57,7 +51,5 @@
         #endregion
 
         private System.Windows.Forms.Timer secondTimer;
-        private System.Windows.Forms.Timer minuteTimer;
-        private System.Windows.Forms.Timer hourTimer;
     }
 }

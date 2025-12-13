@@ -18,10 +18,10 @@ namespace Bai10
 
     public partial class PenDemo : Form
     {
-        List<LineInfo> lines = [];
-        bool drawing = false;
+        readonly List<LineInfo> _lines = [];
+        private bool _drawing = false;
 
-        PointF? startPos, endPos;
+        private PointF? _startPos, _endPos;
         public PenDemo()
         {
             InitializeComponent();
@@ -32,13 +32,13 @@ namespace Bai10
             drawingPanel.Paint += DrawingPanel_Paint;
 
             var styles = Enum.GetNames<DashStyle>();
-            dashStyleComboBox.Items.AddRange(styles.Take(styles.Length - 1).ToArray());
+            dashStyleComboBox.Items.AddRange(styles.Take(styles.Length - 1).ToArray<object>());
             dashStyleComboBox.SelectedIndex = 0;
 
-            lineJoinComboBox.Items.AddRange(Enum.GetNames<LineJoin>());
+            lineJoinComboBox.Items.AddRange([..Enum.GetNames<LineJoin>()]);
             lineJoinComboBox.SelectedIndex = 0;
 
-            var dashCaps = Enum.GetNames<DashCap>();
+            object[] dashCaps = [..Enum.GetNames<DashCap>()];
             dashCapComboBox.Items.AddRange(dashCaps);
             dashCapComboBox.SelectedIndex = 0;
 
@@ -106,10 +106,10 @@ namespace Bai10
 
         private void DrawingPanel_MouseMove(object? sender, MouseEventArgs e)
         {
-            if (!drawing || IsDrawBlocked() || startPos is null)
+            if (!_drawing || IsDrawBlocked() || _startPos is null)
                 return;
 
-            endPos = e.Location;
+            _endPos = e.Location;
             drawingPanel.Invalidate();
 
 
@@ -117,13 +117,13 @@ namespace Bai10
 
         private void DrawingPanel_MouseUp(object? sender, MouseEventArgs e)
         {
-            if (startPos is null)
+            if (_startPos is null)
                 return;
 
-            drawing = false;
-            endPos = e.Location;
+            _drawing = false;
+            _endPos = e.Location;
 
-            lines.Add(new LineInfo
+            _lines.Add(new LineInfo
             {
                 DashCap = GetSettingFromComboBox<DashCap>(dashCapComboBox) ?? DashCap.Flat,
                 DashStyle = GetSettingFromComboBox<DashStyle>(dashStyleComboBox) ?? DashStyle.Solid,
@@ -131,12 +131,12 @@ namespace Bai10
                 LineJoin = GetSettingFromComboBox<LineJoin>(lineJoinComboBox) ?? LineJoin.Miter,
                 StartCap = GetSettingFromComboBox<LineCap>(startCapComboBox) ?? LineCap.Flat,
                 Width = GetSettingFromComboBox(dashWidthComboBox) ?? 1,
-                StartPos = startPos.Value,
-                EndPos = endPos.Value
+                StartPos = _startPos.Value,
+                EndPos = _endPos.Value
             });
 
-            startPos = null;
-            endPos = null;
+            _startPos = null;
+            _endPos = null;
 
             drawingPanel.Invalidate();
         }
@@ -145,12 +145,12 @@ namespace Bai10
         {
             if (e.Button == MouseButtons.Right)
             {
-                lines.Clear();
+                _lines.Clear();
                 drawingPanel.Invalidate();
             }
 
-            drawing = true;
-            startPos = e.Location;
+            _drawing = true;
+            _startPos = e.Location;
         }
 
         private bool IsDrawBlocked()
@@ -176,7 +176,7 @@ namespace Bai10
             if (IsDrawBlocked())
                 return;
 
-            if (startPos is null || endPos is null)
+            if (_startPos is null || _endPos is null)
                 return;
 
             using var pen = new Pen(Color.DarkBlue, 10);
@@ -188,13 +188,13 @@ namespace Bai10
             pen.EndCap = GetSettingFromComboBox<LineCap>(endCapComboBox) ?? pen.EndCap;
             pen.Width = GetSettingFromComboBox(dashWidthComboBox) ?? pen.Width;
 
-            g.DrawLine(pen, startPos.Value, endPos.Value);
+            g.DrawLine(pen, _startPos.Value, _endPos.Value);
         }
 
         private void LineDraw(Graphics g)
         {
             // line drawing
-            foreach (var line in lines)
+            foreach (var line in _lines)
             {
                 using var drawPen = new Pen(Color.DarkBlue, line.Width);
                 drawPen.DashStyle = line.DashStyle;

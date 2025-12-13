@@ -1,4 +1,3 @@
-
 namespace Bai06
 {
     public partial class FontView : Form

@@ -3,18 +3,18 @@ namespace Bai08
     public partial class AnalogClock : Form
     {
         PointF _centerPoint;
-        Image secondHandle;
-        Image minuteHandle;
-        Image hourHandle;
+        private readonly Image _secondHandle;
+        private readonly Image _minuteHandle;
+        private readonly Image _hourHandle;
 
         DateTime _currentTime;
         public AnalogClock()
         {
             InitializeComponent();
 
-            secondHandle = Image.FromFile("ClockHandle/secondHandle.png");
-            minuteHandle = Image.FromFile("ClockHandle/minuteHandle.png");
-            hourHandle = Image.FromFile("ClockHandle/hourHandle.png");
+            _secondHandle = Image.FromFile("ClockHandle/secondHandle.png");
+            _minuteHandle = Image.FromFile("ClockHandle/minuteHandle.png");
+            _hourHandle = Image.FromFile("ClockHandle/hourHandle.png");
 
 
             Paint += AnalogClock_Paint;
@@ -46,7 +46,7 @@ namespace Bai08
 
             for (int i = 0; i < 12; i++)
             {
-                var angle = i * 360 / 12 * Math.PI / 180; // convert to radians
+                var angle = i * 360f / 12f * Math.PI / 180f; // convert to radians
                 var x = _centerPoint.X + radius * Math.Cos(angle);
                 var y = _centerPoint.Y + radius * Math.Sin(angle);
 
@@ -57,7 +57,7 @@ namespace Bai08
             var smallDotRadius = 4f;
             for (int i = 0; i < 60; i++)
             {
-                var angle = i * 360 / 60 * Math.PI / 180; // convert to radians
+                var angle = i * 360 / 60f * Math.PI / 180f; // convert to radians
                 var x = _centerPoint.X + radius * Math.Cos(angle);
                 var y = _centerPoint.Y + radius * Math.Sin(angle);
 
@@ -75,14 +75,14 @@ namespace Bai08
             secondMatrix.RotateAt(secondAngle, _centerPoint);
             g.Transform = secondMatrix;
             g.DrawImage(
-                secondHandle,
+                _secondHandle,
                 new RectangleF(
-                    _centerPoint.X - secondHandle.Width / 2f,
+                    _centerPoint.X - _secondHandle.Width / 2f,
                     _centerPoint.Y - radius + 20,
-                    secondHandle.Width,
-                    secondHandle.Height
+                    _secondHandle.Width,
+                    _secondHandle.Height
                 ),
-                new RectangleF(0, 0, secondHandle.Width, secondHandle.Height),
+                new RectangleF(0, 0, _secondHandle.Width, _secondHandle.Height),
                 GraphicsUnit.Pixel
             );
             g.ResetTransform();
@@ -94,14 +94,14 @@ namespace Bai08
             minuteMatrix.RotateAt(minuteAngle, _centerPoint);
             g.Transform = minuteMatrix;
             g.DrawImage(
-                minuteHandle,
+                _minuteHandle,
                 new RectangleF(
-                    _centerPoint.X - minuteHandle.Width / 2f,
+                    _centerPoint.X - _minuteHandle.Width / 2f,
                     _centerPoint.Y - radius + 40,
-                    minuteHandle.Width,
-                    minuteHandle.Height
+                    _minuteHandle.Width,
+                    _minuteHandle.Height
                 ),
-                new RectangleF(0, 0, minuteHandle.Width, minuteHandle.Height),
+                new RectangleF(0, 0, _minuteHandle.Width, _minuteHandle.Height),
                 GraphicsUnit.Pixel
             );
             g.ResetTransform();
@@ -112,14 +112,14 @@ namespace Bai08
             hourMatrix.RotateAt(hourAngle, _centerPoint);
             g.Transform = hourMatrix;
             g.DrawImage(
-                hourHandle,
+                _hourHandle,
                 new RectangleF(
-                    _centerPoint.X - hourHandle.Width / 2f,
+                    _centerPoint.X - _hourHandle.Width / 2f,
                     _centerPoint.Y - radius + 20f,
-                    hourHandle.Width,
-                    hourHandle.Height
+                    _hourHandle.Width,
+                    _hourHandle.Height
                 ),
-                new RectangleF(0, 0, hourHandle.Width, hourHandle.Height),
+                new RectangleF(0, 0, _hourHandle.Width, _hourHandle.Height),
                 GraphicsUnit.Pixel
             );
             g.ResetTransform();
