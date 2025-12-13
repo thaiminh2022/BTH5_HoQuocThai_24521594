@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.Net.Mime;
 using System.Reflection;
 namespace Bai11
 {
@@ -171,6 +172,47 @@ namespace Bai11
 
         private void DrawShape(Graphics g, Brush br, ShapeData data)
         {
+            if (br is TextureBrush txtBr)
+            {
+                using var path = new GraphicsPath();
+                if (data.Shape == Bai11.DrawShape.Line)
+                {
+                    path.AddLine(data.Start, data.End);
+                }
+                else if (data.Shape == Bai11.DrawShape.Rectangle)
+                {
+                    var rect = new RectangleF(
+                        MathF.Min(data.Start.X, data.End.X),
+                        MathF.Min(data.Start.Y, data.End.Y),
+                        MathF.Abs(data.End.X - data.Start.X),
+                        MathF.Abs(data.End.Y - data.Start.Y)
+                    );
+                    path.AddRectangle(rect);
+                }
+                else if (data.Shape == Bai11.DrawShape.Ellipse)
+                {
+                    var rect = new RectangleF(
+                        MathF.Min(data.Start.X, data.End.X),
+                        MathF.Min(data.Start.Y, data.End.Y),
+                        MathF.Abs(data.End.X - data.Start.X),
+                        MathF.Abs(data.End.Y - data.Start.Y)
+                    );
+                    path.AddEllipse(rect);
+                }
+                
+                var bounds = new RectangleF(
+                    MathF.Min(data.Start.X, data.End.X),
+                    MathF.Min(data.Start.Y, data.End.Y),
+                    MathF.Abs(data.End.X - data.Start.X),
+                    MathF.Abs(data.End.Y - data.Start.Y)
+                );
+                g.SetClip(path);
+                g.DrawImage(txtBr.Image, bounds);
+
+                g.ResetClip();
+                return;
+            }
+
             if (data.Shape == Bai11.DrawShape.Line)
             {
                 using Pen pen = new Pen(br, data.Width);
@@ -211,7 +253,7 @@ namespace Bai11
             {
                 BrushData.Solid => new SolidBrush(color),
                 BrushData.Hatch => new HatchBrush(HatchStyle.DiagonalCross, color, secondary),
-                BrushData.Texture => new TextureBrush(Image.FromFile("uia-uia-cat.png")),
+                BrushData.Texture => new TextureBrush(Image.FromFile("uia-uia-cat.png"), WrapMode.Clamp),
                 BrushData.Gradient => new LinearGradientBrush(start, end, color, secondary),
                 _ => throw new NotImplementedException()
             };
@@ -251,7 +293,6 @@ namespace Bai11
                 colorBtn.BackColor = _currentColor;
             }
         }
-
 
         private bool CanDraw()
         {
