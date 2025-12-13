@@ -15,7 +15,7 @@ namespace Bai06
                 size.Height = font.Height;
                 var label = new Label
                 {
-                    Text = $".{item.Name}",
+                    Text = $@".{item.Name}",
                     Font = font,
                     Size = size,
                     MinimumSize = size,
