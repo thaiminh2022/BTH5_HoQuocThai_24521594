@@ -3,25 +3,9 @@ using System.Reflection;
 
 namespace Bai10
 {
-    internal record LineInfo
-    {
-        public DashStyle DashStyle { get; init; }
-        public float Width { get; init; }
-        public LineJoin LineJoin { get; init; }
-        public DashCap DashCap { get; init; }
-        public LineCap StartCap { get; init; }
-        public LineCap EndCap { get; init; }
-
-        public PointF StartPos { get; init; }
-        public PointF EndPos { get; init; }
-    }
 
     public partial class PenDemo : Form
     {
-        readonly List<LineInfo> _lines = [];
-        private bool _drawing = false;
-
-        private PointF? _startPos, _endPos;
         public PenDemo()
         {
             InitializeComponent();
@@ -50,7 +34,7 @@ namespace Bai10
 
             List<float> sizes = [.. Enumerable.Range(1, 24)];
             dashWidthComboBox.Items.AddRange([.. sizes]);
-            dashWidthComboBox.SelectedIndex = 0;
+            dashWidthComboBox.SelectedIndex = 15;
 
 
             dashStyleComboBox.SelectedIndexChanged += (_, _) => drawingPanel.Invalidate();
@@ -63,11 +47,6 @@ namespace Bai10
 
             dashWidthComboBox.KeyDown += DashWidthComboBox_KeyDown;
 
-            // mouse
-            drawingPanel.MouseDown += DrawingPanel_MouseDown;
-            drawingPanel.MouseUp += DrawingPanel_MouseUp;
-            drawingPanel.MouseMove += DrawingPanel_MouseMove;
-            drawingPanel.Invalidate();
             
             //tooltip
             widthTooltip.SetToolTip(dashWidthComboBox, "Nhập số và nhấn Enter để thêm kích thước tùy chỉnh");
@@ -104,54 +83,8 @@ namespace Bai10
             }
         }
 
-        private void DrawingPanel_MouseMove(object? sender, MouseEventArgs e)
-        {
-            if (!_drawing || IsDrawBlocked() || _startPos is null)
-                return;
-
-            _endPos = e.Location;
-            drawingPanel.Invalidate();
 
 
-        }
-
-        private void DrawingPanel_MouseUp(object? sender, MouseEventArgs e)
-        {
-            if (_startPos is null)
-                return;
-
-            _drawing = false;
-            _endPos = e.Location;
-
-            _lines.Add(new LineInfo
-            {
-                DashCap = GetSettingFromComboBox<DashCap>(dashCapComboBox) ?? DashCap.Flat,
-                DashStyle = GetSettingFromComboBox<DashStyle>(dashStyleComboBox) ?? DashStyle.Solid,
-                EndCap = GetSettingFromComboBox<LineCap>(endCapComboBox) ?? LineCap.Flat,
-                LineJoin = GetSettingFromComboBox<LineJoin>(lineJoinComboBox) ?? LineJoin.Miter,
-                StartCap = GetSettingFromComboBox<LineCap>(startCapComboBox) ?? LineCap.Flat,
-                Width = GetSettingFromComboBox(dashWidthComboBox) ?? 1,
-                StartPos = _startPos.Value,
-                EndPos = _endPos.Value
-            });
-
-            _startPos = null;
-            _endPos = null;
-
-            drawingPanel.Invalidate();
-        }
-
-        private void DrawingPanel_MouseDown(object? sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                _lines.Clear();
-                drawingPanel.Invalidate();
-            }
-
-            _drawing = true;
-            _startPos = e.Location;
-        }
 
         private bool IsDrawBlocked()
         {
@@ -168,7 +101,6 @@ namespace Bai10
             var g = e.Graphics;
 
             MainDraw(g);
-            LineDraw(g);
         }
 
         private void MainDraw(Graphics g)
@@ -176,10 +108,7 @@ namespace Bai10
             if (IsDrawBlocked())
                 return;
 
-            if (_startPos is null || _endPos is null)
-                return;
-
-            using var pen = new Pen(Color.DarkBlue, 10);
+            using var pen = new Pen(Color.Red, 10);
 
             pen.DashStyle = GetSettingFromComboBox<DashStyle>(dashStyleComboBox) ?? pen.DashStyle;
             pen.LineJoin = GetSettingFromComboBox<LineJoin>(lineJoinComboBox) ?? pen.LineJoin;
@@ -188,23 +117,17 @@ namespace Bai10
             pen.EndCap = GetSettingFromComboBox<LineCap>(endCapComboBox) ?? pen.EndCap;
             pen.Width = GetSettingFromComboBox(dashWidthComboBox) ?? pen.Width;
 
-            g.DrawLine(pen, _startPos.Value, _endPos.Value);
+            g.DrawLine(pen,30, 30, 200, 250);
+
+            using var path = new GraphicsPath();
+            path.AddLine(30, 300, 250, 350);
+            path.AddLine(250, 350, 400, 100);
+
+
+            g.DrawPath(pen, path);
+
         }
 
-        private void LineDraw(Graphics g)
-        {
-            // line drawing
-            foreach (var line in _lines)
-            {
-                using var drawPen = new Pen(Color.DarkBlue, line.Width);
-                drawPen.DashStyle = line.DashStyle;
-                drawPen.LineJoin = line.LineJoin;
-                drawPen.DashCap = line.DashCap;
-                drawPen.StartCap = line.StartCap;
-                drawPen.EndCap = line.EndCap;
-                g.DrawLine(drawPen, line.StartPos, line.EndPos);
-            }
-        }
 
         private T? GetSettingFromComboBox<T>(ComboBox box) where T : struct
         {
