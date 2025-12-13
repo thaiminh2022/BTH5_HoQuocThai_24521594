@@ -1,5 +1,4 @@
 ﻿using System.Drawing.Drawing2D;
-using System.Reflection;
 
 namespace Bai10
 {
@@ -9,9 +8,6 @@ namespace Bai10
         public PenDemo()
         {
             InitializeComponent();
-
-            PropertyInfo? doubleBuffered = typeof(Panel).GetProperty("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance);
-            doubleBuffered?.SetValue(drawingPanel, true);
 
             drawingPanel.Paint += DrawingPanel_Paint;
 
@@ -82,9 +78,6 @@ namespace Bai10
                 drawingPanel.Invalidate();
             }
         }
-
-
-
 
         private bool IsDrawBlocked()
         {
