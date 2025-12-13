@@ -1,7 +1,5 @@
 using System.Drawing.Drawing2D;
-using System.Net.Http.Headers;
 using System.Reflection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Bai11
 {
     enum DrawShape
@@ -35,18 +33,18 @@ namespace Bai11
 
     public partial class BasicShapeDrawer : Form
     {
-        DrawShape _currentShape = Bai11.DrawShape.None;
-        BrushData _currentBrush = BrushData.None;
-        Color _currentColor = Color.Black;
-        Color _secondaryColor = Color.White;
-        float _currentWith = 10f;
+        private DrawShape _currentShape = Bai11.DrawShape.None;
+        private BrushData _currentBrush = BrushData.None;
+        private Color _currentColor = Color.Black;
+        private Color _secondaryColor = Color.White;
+        private float _currentWith = 10f;
 
         //
         bool _isDrawing = false;
-        PointF? startPoint, endPoint;
+        private PointF? _startPoint, _endPoint;
 
         //
-        List<ShapeData> _shapes = new List<ShapeData>();
+        private readonly List<ShapeData> _shapes = [];
 
         public BasicShapeDrawer()
         {
@@ -107,16 +105,16 @@ namespace Bai11
         {
             if (!_isDrawing) return;
 
-            endPoint = e.Location;
+            _endPoint = e.Location;
             drawingPanel.Invalidate();
         }
 
         private void DrawingPanel_MouseUp(object? sender, MouseEventArgs e)
         {
-            if (startPoint is null) return;
+            if (_startPoint is null) return;
 
             _isDrawing = false;
-            endPoint = e.Location;
+            _endPoint = e.Location;
 
             if (CanDraw())
             {
@@ -127,13 +125,13 @@ namespace Bai11
                     Color = _currentColor,
                     SecondaryColor = _secondaryColor,
                     Width = _currentWith,
-                    Start = startPoint.Value,
-                    End = endPoint.Value
+                    Start = _startPoint.Value,
+                    End = _endPoint.Value
                 });
             }
 
-            endPoint = null;
-            startPoint = null;
+            _endPoint = null;
+            _startPoint = null;
 
             drawingPanel.Invalidate();
         }
@@ -141,7 +139,7 @@ namespace Bai11
         private void DrawingPanel_MouseDown(object? sender, MouseEventArgs e)
         {
             _isDrawing = true;
-            startPoint = e.Location;
+            _startPoint = e.Location;
         }
 
         private void DrawingPanel_Paint(object? sender, PaintEventArgs e)
@@ -152,12 +150,12 @@ namespace Bai11
                 DrawShape(e.Graphics, shapeBrush, shape);
             }
 
-            if (CanDraw() && _isDrawing && startPoint is not null && endPoint is not null)
+            if (CanDraw() && _isDrawing && _startPoint is not null && _endPoint is not null)
             {
-                if (startPoint == endPoint)
+                if (_startPoint == _endPoint)
                     return;
 
-                using Brush br = GetBrush(_currentBrush, startPoint.Value, endPoint.Value, _currentColor, _secondaryColor);
+                using Brush br = GetBrush(_currentBrush, _startPoint.Value, _endPoint.Value, _currentColor, _secondaryColor);
                 DrawShape(e.Graphics, br, new ShapeData
                 {
                     Brush = _currentBrush,
@@ -165,8 +163,8 @@ namespace Bai11
                     SecondaryColor = _secondaryColor,
                     Width = _currentWith,
                     Shape = _currentShape,
-                    Start = startPoint.Value,
-                    End = endPoint.Value
+                    Start = _startPoint.Value,
+                    End = _endPoint.Value
                 });
             }
         }
